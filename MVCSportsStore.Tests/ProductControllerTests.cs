@@ -20,7 +20,7 @@ namespace MVCSportsStore.Tests
         {
             //Arrange
             Mock<IProductRepository> mock = new Mock<IProductRepository>();
-            mock.Setup(x => x.Products).Returns(GetMockProductList());
+            mock.Setup(x => x.Products).Returns(GetProductList());
 
             ProductController controller = new ProductController(mock.Object);
             controller.PageSize = 3;
@@ -39,7 +39,7 @@ namespace MVCSportsStore.Tests
         public void Can_Generate_Page_Links()
         {
             //Arrange
-            var pagingInfo = new PagingInfo()
+            var pagingInfo = new PagingInfo
             {
                 CurrentPage = 2,
                 TotalItems = 28,
@@ -63,7 +63,7 @@ namespace MVCSportsStore.Tests
         public void Can_Send_Pagination_View_Model()
         {
             Mock<IProductRepository> mock = new Mock<IProductRepository>();
-            mock.Setup(x => x.Products).Returns(GetMockProductList);
+            mock.Setup(x => x.Products).Returns(GetProductList);
 
             ProductController controller = new ProductController(mock.Object);
             controller.PageSize = 3;
@@ -74,15 +74,43 @@ namespace MVCSportsStore.Tests
             Assert.AreEqual(result.PagingInfo.TotalItems, 5);
         }
 
-        private IEnumerable<Product> GetMockProductList()
+        [TestMethod]
+        public void Can_Filter_Products()
+        {
+            Mock<IProductRepository> mock = new Mock<IProductRepository>();
+            mock.Setup(x => x.Products).Returns(GetProductList);
+            
+            ProductController controller = new ProductController(mock.Object);
+            controller.PageSize = 3;
+
+            var result = controller.List("Soccer", 1).Model as ProductListViewModel;
+
+            Assert.AreEqual(result.Products.Count(x => x.Category == "Soccer"), 2);
+        }
+
+        [TestMethod]
+        public void Products_CategorySpecificCounts_ReturnsCorrectCounts()
+        {
+            Mock<IProductRepository> mock = new Mock<IProductRepository>();
+            mock.Setup(x => x.Products).Returns(GetProductList);
+            
+            ProductController controller = new ProductController(mock.Object);
+            controller.PageSize = 3;
+
+            var result = controller.List("Soccer", 1).Model as ProductListViewModel;
+
+            Assert.AreEqual(result.PagingInfo.TotalItems, 2);
+        }
+
+        private IEnumerable<Product> GetProductList()
         {
             return new List<Product>
             {
-                new Product { ProductId = 1, Name = "P1"},
-                new Product { ProductId = 2, Name = "P2"},
-                new Product { ProductId = 3, Name = "P3"},
-                new Product { ProductId = 4, Name = "P4"},
-                new Product { ProductId = 5, Name = "P5"}
+                new Product { ProductId = 1, Name = "P1", Category = "Soccer"},
+                new Product { ProductId = 2, Name = "P2", Category = "Soccer"},
+                new Product { ProductId = 3, Name = "P3", Category = "Watersports"},
+                new Product { ProductId = 4, Name = "P4", Category = "Watersports"},
+                new Product { ProductId = 5, Name = "P5", Category = "Watersports"}
             };
         }
     }

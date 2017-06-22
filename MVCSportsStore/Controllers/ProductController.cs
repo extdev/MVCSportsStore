@@ -26,7 +26,7 @@ namespace MVCSportsStore.Controllers
             {
                 Products = _productRepository
                 .Products
-                .Where(x => x.Category == category || x.Category == null)
+                .Where(x => x.Category == category || category == null)
                 .OrderBy(p => p.ProductId)
                 .Skip((page - 1) * PageSize)
                 .Take(PageSize),
@@ -35,7 +35,7 @@ namespace MVCSportsStore.Controllers
                 {
                     CurrentPage = page,
                     ItemsPerPage = PageSize,
-                    TotalItems = _productRepository.Products.Count()
+                    TotalItems = category == null ? _productRepository.Products.Count() : _productRepository.Products.Count(x => x.Category == category)
                 },
                 CurrentCategory = category
             };
