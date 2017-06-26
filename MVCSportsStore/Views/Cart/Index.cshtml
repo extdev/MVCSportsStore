@@ -1,7 +1,16 @@
-﻿@model MVCSportsStore.Models.CartIndexViewModel
+﻿
+@model MVCSportsStore.Models.CartIndexViewModel
+
+@{
+    ViewBag.Title = "Sports Store: Your Cart";
+}
+
+<style>
+  #cartTable td {vertical-align: middle;}  
+</style>
 
 <h2>Your cart</h2>
-<table class="table">
+<table class="table" id="cartTable">
     <thead>
         <tr>
             <th>Quantity</th>
@@ -20,6 +29,16 @@
                 <td class="text-right">
                     @((line.Quantity * line.Product.Price).ToString("c"))
                 </td>
+                <td>
+                    @using (Html.BeginForm("RemoveFromCart", "Cart"))
+                    {
+                        <div class="pull-right">
+                            @Html.Hidden("ProductId",line.Product.ProductId)
+                            @Html.HiddenFor(x => x.ReturnUrl)
+                            <input class="btn btn-sm btn-warning" type="submit" value="Remove"/>
+                        </div>
+                    }
+                </td>
             </tr>
         }
     </tbody>
@@ -34,4 +53,5 @@
 </table>
 <div class="text-center">
     <a class="btn btn-primary" href="@Model.ReturnUrl">Continue shopping</a>
+    @Html.ActionLink("Checkout now","Checkout", null, new {@class = "btn btn-primary"})
 </div>
