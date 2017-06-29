@@ -9,10 +9,12 @@ namespace MVCSportsStore.Controllers
     public class CartController: Controller
     {
         private readonly IProductRepository _productRepository;
+        private readonly IOrderProcessor _orderProcessor;
 
-        public CartController(IProductRepository productRepository)
+        public CartController(IProductRepository productRepository, IOrderProcessor orderProcessor)
         {
             _productRepository = productRepository;
+            _orderProcessor = orderProcessor;
         }
 
         public ViewResult Index(Cart cart, string returnUrl)
@@ -53,9 +55,27 @@ namespace MVCSportsStore.Controllers
             return PartialView(cart);
         }
 
-        public ViewResult Checkout()
+        public ViewResult Checkout(Cart cart)
         {
-            return View(new ShippingDetails());
+           return View(new ShippingDetails());
+        }
+
+        [HttpPost]
+        public ViewResult Checkout(Cart cart, ShippingDetails shippingDetails)
+        {
+            if (!cart.Lines.Any())
+            {
+                ModelState.AddModelError("", "Sorry, your cart is empty!");
+            }
+
+            if (ModelState.IsValid)
+            {
+                _orderProcessor.ProcessOrder(cart, shippingDetails);
+                cart.Clear();
+                return View("Completed");
+            }
+
+            return View(shippingDetails);
         }
     }
 }

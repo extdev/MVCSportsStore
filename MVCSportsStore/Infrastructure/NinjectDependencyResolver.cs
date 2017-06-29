@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Web.Mvc;
 using MVCSportsStore.Domain.Abstract;
 using MVCSportsStore.Domain.Concrete;
@@ -28,15 +29,14 @@ namespace MVCSportsStore.Infrastructure
 
         private void AddBindings()
         {
-            //Mock<IProductRepository> products = new Mock<IProductRepository>();
-            //products.Setup(x => x.Products).Returns(new List<Product>
-            //{
-            //    new Product {Name = "Football", Price = 25 },
-            //    new Product {Name = "Surf board", Price = 179 },
-            //    new Product {Name = "Running shoes", Price = 95 },
-            //});
-            
             _kernel.Bind<IProductRepository>().To<EFProductRepository>();
+
+            EmailSettings emailSettings = new EmailSettings
+            {
+                WriteAsFile = bool.Parse(ConfigurationManager.AppSettings["Email.WriteAsFile"] ?? "false")
+            };
+
+            _kernel.Bind<IOrderProcessor>().To<EmailOrderProcessor>().WithConstructorArgument("settings", emailSettings);
         }
     }
 }

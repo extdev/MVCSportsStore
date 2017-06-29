@@ -24,6 +24,7 @@ namespace MVCSportsStore
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
+                      "~/Content/ErrorStyles.css",
                       "~/Content/site.css"));
         }
     }
